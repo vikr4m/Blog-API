@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -19,6 +21,7 @@ import com.blog.security.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
 	@Autowired
@@ -35,10 +38,14 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(
 						auth -> auth.requestMatchers("/api/auth/login").permitAll().anyRequest().authenticated())
-				.exceptionHandling(e -> e.authenticationEntryPoint(this.jwtAuthenticationEntryPoint))
+				.exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint))
 				.sessionManagement(t -> t.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-		return http.addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class).build();
+		//permitAll() function allows access to all types user whether it is admin or normal
+		
+		http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+		
+		return http.build();
 
 	}
 
