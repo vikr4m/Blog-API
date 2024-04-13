@@ -5,6 +5,10 @@ import java.util.List;
 import com.blog.payloads.UserDto;
 
 public interface UserService {
+	
+	//register users
+	UserDto registerNewUser(UserDto user);
+	
 	//create
 	UserDto createUser(UserDto user);
 	
